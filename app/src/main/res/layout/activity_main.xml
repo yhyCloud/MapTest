@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <RadioGroup
+        android:id="@+id/radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fff"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/rd_map"
+            style="@style/tab_menu_item"
+            android:drawableTop="@drawable/selector_map_drawable"
+            android:textColor="@drawable/selector_text"
+            android:text="地图"
+            />
+        <RadioButton
+            android:id="@+id/rd_network"
+            style="@style/tab_menu_item"
+            android:drawableTop="@drawable/selector_network_drawable"
+            android:textColor="@drawable/selector_text"
+            android:text="网络"/>
+        <RadioButton
+            android:id="@+id/rd_camera"
+            style="@style/tab_menu_item"
+            android:drawableTop="@drawable/selector_camera_drawable"
+            android:textColor="@drawable/selector_text"
+            android:text="设备"/>
+        <RadioButton
+            android:id="@+id/rd_setting"
+            style="@style/tab_menu_item"
+            android:drawableTop="@drawable/selector_setting_drawable"
+            android:textColor="@drawable/selector_text"
+
+            android:text="设置"/>
+    </RadioGroup>
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/radio_group"
+        />
+
+</RelativeLayout>

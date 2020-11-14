@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+
+    <ImageView
+        android:id="@+id/expendlistview_child_iv"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="5dp"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/camera_photo" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="5dp">
+        <TextView
+            android:id="@+id/file_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="文件名称"
+            android:textSize="18sp"/>
+        <TextView
+            android:id="@+id/file_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2.45MB"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="right"
+        android:layout_marginLeft="50dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/file_generate_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="2020-10-11" />
+
+        <TextView
+            android:id="@+id/file_generate_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="16:40"
+
+            />
+    </LinearLayout>
+
+</LinearLayout>

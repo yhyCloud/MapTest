@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_marginTop="15dp"
+        android:id="@+id/camera_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/camera_color"
+        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/camera_info_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="id:001"
+            android:layout_marginLeft="5dp"
+            />
+        <TextView
+            android:id="@+id/camera_info_ip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ip:192.168.1.1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="3dp"
+            />
+
+        <TextView
+            android:id="@+id/camera_info_gps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="经度 ** 纬度 **"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="3dp" />
+    </LinearLayout>
+
+</LinearLayout>

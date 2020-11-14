@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/camerainfoactivity_scrollview"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".CameraInfoActivity">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center_horizontal"
+
+                    android:src="@drawable/camera_color" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="相机信息"/>
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/cameradata"
+                    android:layout_marginTop="92dp"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="相机数据"/>
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="73dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="158dp"
+                    android:src="@drawable/monitor" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="数据显示"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/camera_activity_id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginRight="5dp"
+                            android:text="相机id 101"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#220000" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/camera_activity_ip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="相机ip 192.168.255.255"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#220000" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/camera_activity_latitude"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="纬度 30:28N"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/camera_activity_longitude"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="经度 103:54E"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#220000" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/camera_activity_capacity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="存储 5.6G/29.9G"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:id="@+id/camera_activity_battery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="29dp"
+                        android:layout_marginTop="5dp"
+                        android:text="电量 65%"
+                        android:textSize="18sp"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#220000" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/camera_activity_showPresentBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="实时画面" />
+
+                    <Button
+                        android:id="@+id/camera_activity_cameraSettingBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_weight="1"
+                        android:text="相机设置" />
+                </LinearLayout>
+
+
+<!--                <ImageView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="190dp"-->
+<!--                    android:layout_marginTop="5dp"-->
+<!--                    android:src="@drawable/panda">-->
+<!--                </ImageView>-->
+                <ExpandableListView
+                    android:id="@+id/file_listview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="240dp"/>
+                <ImageView
+                    android:layout_marginTop="10dp"
+                    android:id="@+id/filePhotoShow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="190dp"
+                    android:src="@drawable/panda9">
+                </ImageView>
+            </LinearLayout>
+        </LinearLayout>
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
+
+<!--        </LinearLayout>-->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#220000"
+            android:layout_above="@+id/map"
+            android:layout_marginBottom="5dp"/>
+
+        <LinearLayout
+            android:layout_marginTop="630dp"
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+
+            >
+
+            <com.baidu.mapapi.map.MapView
+                android:id="@+id/locationMapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:clickable="true" />
+        </LinearLayout>
+
+        <ImageButton
+            android:visibility="visible"
+            android:id="@+id/ib_location"
+            android:onClick="resetLocation"
+            android:layout_alignParentBottom="true"
+            android:background="@mipmap/icon_location"
+            android:layout_marginBottom="200dp"
+            android:layout_marginLeft="20dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+
+    </RelativeLayout>
+</ScrollView>
