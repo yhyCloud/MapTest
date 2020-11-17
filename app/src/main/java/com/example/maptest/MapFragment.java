@@ -174,7 +174,7 @@ public class MapFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 fragBaiduMap.clear();
-                setMarker();
+                setMarker();//标点函数
             }
         });
     }

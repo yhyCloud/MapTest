@@ -1,10 +1,19 @@
 package com.example.maptest;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -35,7 +45,12 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CameraInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -57,9 +72,8 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
 
     private ScrollView mScrollView;//滑动布局栏
 
-    private ImageView mImageView;
-
-    private ExpandableListView mExpandableListView;
+    private ImageView mImageView;//显示图像文件imageview控件
+    private ExpandableListView mExpandableListView;//显示文件列表控件
 
     //item数据测试用
     private ArrayList<String> mGroupList;
@@ -69,6 +83,9 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
 
     private Button showPresentBtn;//显示实时画面按钮
     private Button cameraSettingBtn;//跳转相机设置界面按钮
+    private VideoView mVideoView;//显示实时画面控件
+    private Button videoPlay;//播放
+    private Button videoPause;//暂停
 
 
 
@@ -107,7 +124,8 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
         });
         showPresentBtn.setOnClickListener(this);
         cameraSettingBtn.setOnClickListener(this);
-
+        videoPlay.setOnClickListener(this);
+        videoPause.setOnClickListener(this);
 
     }
 
@@ -161,6 +179,9 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
         mImageView = findViewById(R.id.filePhotoShow);
         showPresentBtn = findViewById(R.id.camera_activity_showPresentBtn);
         cameraSettingBtn = findViewById(R.id.camera_activity_cameraSettingBtn);
+        mVideoView = findViewById(R.id.video_view);//视频控件
+        videoPause = findViewById(R.id.video_pause);//暂停按钮
+        videoPlay = findViewById(R.id.video_play);//播放按钮
     }
 
     private void initLocation() {
@@ -256,16 +277,52 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.camera_activity_showPresentBtn://显示实时画面按钮
-                mImageView.setImageResource(R.drawable.presentvideo);
+//                initPermission();
+                initVideoPath();
+//                showExternalImage();
+//                mImageView.setImageResource(R.drawable.presentvideo);
+//                initVideoPath();
                 break;
             case R.id.camera_activity_cameraSettingBtn://相机设置按钮
                 Intent intent = new Intent(CameraInfoActivity.this, MainActivity.class);
                 intent.putExtra("id", 3);
                 CameraInfoActivity.this.startActivity(intent);
-
             default:
                 break;
         }
+    }
+
+    private void showExternalImage() {
+        String url = "/storage/emulated/0/Pictures/WeiXin/mmexport1605513821590.jpg";
+        try {
+            FileInputStream fis = new FileInputStream(url);
+            Bitmap bitmap= BitmapFactory.decodeStream(fis);  ///把流转化为Bitmap图片
+            mImageView.setImageBitmap(bitmap);
+            Toast.makeText(this,"显示相机图像",Toast.LENGTH_SHORT).show();
+        }
+         catch (Exception e) {
+             Toast.makeText(this,"未能显示",Toast.LENGTH_SHORT).show();
+             e.printStackTrace();
+         }
+
+
+//        Toast.makeText(this,"显示手机内部图片",Toast.LENGTH_SHORT).show();
+
+    }
+
+    private void initVideoPath() {
+//        File file = new File(Environment.getExternalStorageDirectory(),
+//                "/Pictures/QQ/pandavideo_cut.mp4");
+//        System.out.println(file.getPath());
+        File file = new File(Environment.getExternalStorageDirectory(),
+                "/Pictures/QQ/pandavideo_cut.mp4");
+        String videoPath = file.getAbsolutePath();
+
+//        Toast.makeText(this,"文件是否存在"+file.exists(),Toast.LENGTH_LONG).show();
+       Toast.makeText(this,"文件路径"+videoPath,Toast.LENGTH_LONG).show();
+        mVideoView.setVideoPath(videoPath);
+        mVideoView.start();
+
     }
 
     /**
@@ -278,7 +335,6 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
             if (location == null || mMapView == null) {
                 return;
             }
-
             double resultLatitude;
             double resultLongitude;
             if (markerLatitude == 0) {
@@ -361,4 +417,52 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
         photo.add(R.drawable.panda9);
     }
 
+
+    String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.INTERNET
+            };
+    List<String> mPermissionList = new ArrayList<>();
+    private final int mRequestCode = 100;//权限请求码
+
+    private void initPermission() {
+        mPermissionList.clear();//清空没有通过的权限
+        //逐个判断你要的权限是否已经通过
+        for (int i = 0; i < permissions.length; i++) {
+            if (ContextCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                mPermissionList.add(permissions[i]);//添加还未授予的权限
+            }
+        }
+        //申请权限
+        if (mPermissionList.size() > 0) {//有权限没有通过，需要申请
+            ActivityCompat.requestPermissions(this, permissions, mRequestCode);
+        }else{
+            showExternalImage();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        boolean hasPermissionDismiss = false;//有权限没有通过
+        if (mRequestCode == requestCode) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == -1) {
+                    hasPermissionDismiss = true;
+                }
+            }
+            if (hasPermissionDismiss) {
+                Toast.makeText(this,"拒绝权限将无法访问",Toast.LENGTH_LONG).show();
+                finish();
+            }else {
+                showExternalImage();
+            }
+        }
+    }
 }

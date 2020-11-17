@@ -193,6 +193,33 @@
 <!--                    android:layout_marginTop="5dp"-->
 <!--                    android:src="@drawable/panda">-->
 <!--                </ImageView>-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:orientation="vertical"
+                    >
+                    <VideoView
+                        android:id="@+id/video_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/video_play"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="播放"/>
+                        <Button
+                            android:id="@+id/video_pause"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="暂停"/>
+                    </LinearLayout>
+                </LinearLayout>
                 <ExpandableListView
                     android:id="@+id/file_listview"
                     android:layout_width="wrap_content"
@@ -221,7 +248,7 @@
             android:layout_marginBottom="5dp"/>
 
         <LinearLayout
-            android:layout_marginTop="630dp"
+            android:layout_marginTop="900dp"
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="300dp"
