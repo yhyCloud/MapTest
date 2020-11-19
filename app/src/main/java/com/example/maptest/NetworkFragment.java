@@ -6,9 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.baidu.location.BDLocation;
@@ -31,7 +34,7 @@ import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.Stroke;
 import com.baidu.mapapi.model.LatLng;
 
-public class NetworkFragment extends Fragment {
+public class NetworkFragment extends Fragment implements View.OnClickListener {
     private MapView fragNetMapView;
     private BaiduMap fragNetBaiduMap;
     private LocationClient fragLocationClient;
@@ -42,9 +45,12 @@ public class NetworkFragment extends Fragment {
     private double markerLongitude;//标点经度
     private Marker mMarker;//标点
 
+
+
     private static boolean isFirstDraw = false;
 
     private Button BtnViewNetworkLocation;
+
 
     @Nullable
     @Override
@@ -53,17 +59,10 @@ public class NetworkFragment extends Fragment {
         SDKInitializer.initialize(getActivity().getApplicationContext());
         View view = inflater.inflate(R.layout.network_fragment, container, false);
         initView(view);
-        BtnViewNetworkLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                initLocation();
-                if (isFirstDraw == false) {
-                    isFirstDraw = true;
-                    DrawAP();
-                    DrawBridge();
-                }
-            }
-        });
+        BtnViewNetworkLocation.setOnClickListener(this);
+
+
+
 //        initNetWork();
 //        mapOnClick();
         return view;
@@ -127,6 +126,22 @@ public class NetworkFragment extends Fragment {
         option.setIsNeedAddress(true);
         fragLocationClient.setLocOption(option);
         fragLocationClient.start();
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_viewNetWorkLocation:
+                initLocation();
+                if (isFirstDraw == false) {
+                    isFirstDraw = true;
+                    DrawAP();
+                    DrawBridge();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     private class MyLocationListener implements BDLocationListener {

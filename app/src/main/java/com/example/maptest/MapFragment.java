@@ -6,12 +6,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.baidu.location.BDLocation;
@@ -46,12 +50,20 @@ public class MapFragment extends Fragment {
 
     private ImageButton fragIbLocation;//重定位按钮
 
-    private Button fragBtnShowCameraLocation;
+    private Button fragBtnShowCameraLocation;//显示相机布点按钮
     private BitmapDescriptor bitmap;//标点的图标
     private double markerLatitude;//标点的纬度
     private double markerLongitude;//标点经度
     private Marker mMarker;//标点
     private static boolean isFirstAdd=true;
+
+    private DrawerLayout mDrawerLayout;//布局
+    private ImageButton showLocationDrawer;//弹出地点列表抽屉
+
+    private ListView LocationListView;//抽屉中的地点列表
+    private Button drawerBackBtn;//抽屉布局中的返回按钮
+    private ImageButton drawerRefreshLocation;//抽屉布局中刷新地点按钮
+
 
     private static Toast toast;
 
@@ -72,6 +84,7 @@ public class MapFragment extends Fragment {
         initView(view);
         initLocation();
         mapOnClick();
+        setLocationInfo();
 //        setMaker();
 
 
@@ -143,6 +156,12 @@ public class MapFragment extends Fragment {
         fragMapView.showScaleControl(true);
         fragBaiduMap = fragMapView.getMap();
         fragBtnShowCameraLocation = view.findViewById(R.id.btn_show_camera_location);
+
+        mDrawerLayout = view.findViewById(R.id.mapFragmentDrawer);
+        showLocationDrawer = view.findViewById(R.id.imbtn_show_location_drawer);
+        LocationListView = view.findViewById(R.id.location_listview);
+        drawerBackBtn = view.findViewById(R.id.back_button);
+
         fragBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -177,6 +196,22 @@ public class MapFragment extends Fragment {
                 setMarker();//标点函数
             }
         });
+
+        showLocationDrawer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
+        drawerBackBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+            }
+        });
+
+
     }
 
     private void addCameraLocation(double Lat,double Lng,BaiduMap map) {
@@ -193,9 +228,7 @@ public class MapFragment extends Fragment {
                 .scaleY((float) 0.15);
         map.addOverlay(option);
     }
-
-
-
+    
     private void setMarker() {
         List<LatLng> latLngList = new ArrayList<>();
         List<OverlayOptions> optionsList = new ArrayList<>();
@@ -287,10 +320,23 @@ public class MapFragment extends Fragment {
     }
 
     private void toCameraInfo(View view,Bundle bundle) {
-
         Intent intent = new Intent(getActivity(), CameraInfoActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    private void setLocationInfo() {
+        List<String> locationInfo = new ArrayList<>();
+        locationInfo.add("成都-熊猫基地1");
+        locationInfo.add("成都-熊猫基地2");
+        locationInfo.add("成都-熊猫基地3");
+        locationInfo.add("雅安-大相岭1");
+        locationInfo.add("雅安-大相岭2");
+        locationInfo.add("成都-电子科技大学1");
+        locationInfo.add("成都-电子科技大学2");
+        ArrayAdapter locationAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, locationInfo);
+        LocationListView.setAdapter(locationAdapter);
+
     }
 
 
