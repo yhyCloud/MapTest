@@ -228,7 +228,7 @@ public class MapFragment extends Fragment {
                 .scaleY((float) 0.15);
         map.addOverlay(option);
     }
-    
+
     private void setMarker() {
         List<LatLng> latLngList = new ArrayList<>();
         List<OverlayOptions> optionsList = new ArrayList<>();
