@@ -3,9 +3,13 @@ package com.example.maptest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -38,6 +42,11 @@ import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 
 import java.net.InetAddress;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,8 +73,18 @@ public class MapFragment extends Fragment {
     private Button drawerBackBtn;//抽屉布局中的返回按钮
     private ImageButton drawerRefreshLocation;//抽屉布局中刷新地点按钮
 
+//    ArrayList<LatLng> locationList ;
+    public ArrayList<String> locationName = new ArrayList<>();//从数据库中获取的地点名字
+    public ArrayList<String> locationLat = new ArrayList<>();//从数据库中获取的纬度信息
+    public ArrayList<String> locationLng = new ArrayList<>();//从数据库中获取的经度信息
+    public Bundle locationBundle = new Bundle();
 
     private static Toast toast;
+
+
+
+
+
 
 
     @Override
@@ -84,7 +103,8 @@ public class MapFragment extends Fragment {
         initView(view);
         initLocation();
         mapOnClick();
-        setLocationInfo();
+
+//        setLocationInfo();
 //        setMaker();
 
 
@@ -161,6 +181,7 @@ public class MapFragment extends Fragment {
         showLocationDrawer = view.findViewById(R.id.imbtn_show_location_drawer);
         LocationListView = view.findViewById(R.id.location_listview);
         drawerBackBtn = view.findViewById(R.id.back_button);
+        drawerRefreshLocation = view.findViewById(R.id.drawerRefreshLocation);
 
         fragBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
@@ -200,6 +221,7 @@ public class MapFragment extends Fragment {
         showLocationDrawer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                refreshLocation();// 点开抽屉列表时刷新地点
                 mDrawerLayout.openDrawer(GravityCompat.START);
             }
         });
@@ -210,8 +232,45 @@ public class MapFragment extends Fragment {
                 mDrawerLayout.closeDrawer(GravityCompat.START);
             }
         });
+        drawerRefreshLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                refreshLocation();
+
+            }
+        });
 
 
+
+//        locationList = new ArrayList<>();
+//        locationList.add(new LatLng(30.742, 104.151));//熊猫基地坐标
+//        locationList.add(new LatLng(30.742, 104.151));
+//        locationList.add(new LatLng(30.742, 104.151));
+//        locationList.add(new LatLng(29.66194, 102.64869));//大相岭坐标
+//        locationList.add(new LatLng(29.66195, 102.64879));
+//        locationList.add(new LatLng(30.753, 103.934));//电子科技大学坐标
+//        locationList.add(new LatLng(30.753, 103.934));
+        LocationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                double lat =Double.valueOf(locationLat.get(i));
+                double lng = Double.valueOf(locationLng.get(i));
+                LatLng latLng = new LatLng(lat, lng);
+                    MapStatus mMapStatus = new MapStatus.Builder()
+                            .target(latLng).zoom(18).build();
+                    MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+                    fragBaiduMap.setMapStatus(mMapStatusUpdate);
+            }
+
+        });
+
+
+    }
+
+    private void refreshLocation() {
+        GetLocationThread refreshLocationThread = new GetLocationThread();
+        refreshLocationThread.start();
     }
 
     private void addCameraLocation(double Lat,double Lng,BaiduMap map) {
@@ -325,20 +384,88 @@ public class MapFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void setLocationInfo() {
-        List<String> locationInfo = new ArrayList<>();
-        locationInfo.add("成都-熊猫基地1");
-        locationInfo.add("成都-熊猫基地2");
-        locationInfo.add("成都-熊猫基地3");
-        locationInfo.add("雅安-大相岭1");
-        locationInfo.add("雅安-大相岭2");
-        locationInfo.add("成都-电子科技大学1");
-        locationInfo.add("成都-电子科技大学2");
-        ArrayAdapter locationAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, locationInfo);
-        LocationListView.setAdapter(locationAdapter);
-
+    private void setLocationInfo(Bundle locationBundle) {
+        ArrayList<String> locationInfo ;
+//        locationInfo.add("成都-熊猫基地1");
+//        locationInfo.add("成都-熊猫基地2");
+//        locationInfo.add("成都-熊猫基地3");
+//        locationInfo.add("雅安-大相岭1");
+//        locationInfo.add("雅安-大相岭2");
+//        locationInfo.add("成都-电子科技大学1");
+//        locationInfo.add("成都-电子科技大学2");
+        locationInfo = locationBundle.getStringArrayList("locationName");
+        if (locationInfo != null) {
+            ArrayAdapter locationAdapter = new ArrayAdapter<String>(getActivity(),
+                    android.R.layout.simple_list_item_1, locationInfo);
+            LocationListView.setAdapter(locationAdapter);
+        }
     }
 
+    public class GetLocationThread extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Log.d("MainActivity", "加载JDBC驱动成功！");
+            } catch (ClassNotFoundException e) {
+                Log.d("MainActivity", "加载JDBC驱动失败！");
+                e.printStackTrace();
+                return;
+            }
+            String url = "jdbc:mysql://192.168.50.39:3512/location?useSSL=false&serverTimezone=Hongkong&useUnicode=true&characterEncoding=utf-8 ";
+            // 构建连接mysql的字符串
+            String user = "root"; //自己的用户名
+            String password = "root"; //自己的密码
+            try {
+                Connection connection = DriverManager.getConnection(url, user, password);
+                Log.d("MainActivity", "连接数据库成功");
+                String sql="SELECT * FROM locationdata";
+                try {
+                    Statement statement = connection.createStatement();
+                    ResultSet res = statement.executeQuery(sql);
+                    locationName.clear();
+                    locationLat.clear();
+                    locationLng.clear();
+                    Log.d("MainActivity", "地点信息");
+                    while (res.next()) {
+                        Log.d("MainActivity",res.getInt(1) + "\t"
+                                + res.getString(2) + "\t"
+                                + res.getDouble(3) + "\t"
+                                + res.getDouble(4));
+                        locationName.add(res.getString(2));
+                        locationLat.add(res.getString(3));
+                        locationLng.add(res.getString(4));
+                    }
+
+                    locationBundle.putStringArrayList("locationName", locationName);
+                    locationBundle.putStringArrayList("locationLat", locationLat);
+                    locationBundle.putStringArrayList("locationLng", locationLng);
+//                    Message locationMessage = new Message();
+//                    locationMessage.setData(locationBundle);
 
 
+                } catch (SQLException e) {
+                    Log.e("MainActivity", "查询错误");
+                    e.printStackTrace();
+                }
+                try {
+                    connection.close();
+                    Log.d("MainActivity", "关闭链接成功");
+                } catch (SQLException e) {
+                    Log.d("MainActivity", "关闭连接失败。");
+                    e.printStackTrace();
+                }
+            } catch (SQLException e) {
+                Log.d("MainActivity", "连接数据库失败!");
+                e.printStackTrace();
+            }
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setLocationInfo(locationBundle);
+                }
+            });
+        }
+    }
 }

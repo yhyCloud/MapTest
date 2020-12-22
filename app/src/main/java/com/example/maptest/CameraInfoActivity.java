@@ -7,16 +7,21 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.view.MotionEvent;
+import android.view.SurfaceView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
@@ -44,11 +49,12 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.example.maptest.vlc.VlcModel;
+
+import org.videolan.libvlc.MediaPlayer;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,8 +90,12 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
     private Button showPresentBtn;//显示实时画面按钮
     private Button cameraSettingBtn;//跳转相机设置界面按钮
     private VideoView mVideoView;//显示实时画面控件
-    private Button videoPlay;//播放
-    private Button videoPause;//暂停
+    private SurfaceView mSurfaceView;//显示实时画面的控件
+    private Button RtspRefreshButton;//播放
+    private Button RtspStopButton;//暂停
+
+    private VlcModel mVlcModel;
+    private Handler mHandler;
 
 
 
@@ -108,6 +118,20 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
             setMarkerLocation(bundle);
         }
         initTestData();
+
+        //Vlc相关线程
+//        mVlcModel = new VlcModel("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov", (SurfaceView) findViewById(R.id.surfaceV), mEventListener);
+        mVlcModel = new VlcModel("rtsp://192.168.50.60:554/test.264", (SurfaceView) findViewById(R.id.surfaceV), mEventListener);
+        HandlerThread handlerThread = new HandlerThread("");
+        handlerThread.start();
+        mHandler = new Handler(handlerThread.getLooper());
+        //Android6.0以下不能隐藏状态栏
+        if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) {
+            mVlcModel.setLandscapeDisplayHeight(mVlcModel.getLandscapeDisplayHeight() - getStatusBarHeight(this));
+        }
+        mVlcModel.updateVideoSurfaces();
+
+
         FileInfoAdapter adapter = new FileInfoAdapter(this, mGroupList, mItemSet);
         mExpandableListView.setAdapter(adapter);
         mExpandableListView.expandGroup(0);
@@ -124,8 +148,8 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
         });
         showPresentBtn.setOnClickListener(this);
         cameraSettingBtn.setOnClickListener(this);
-        videoPlay.setOnClickListener(this);
-        videoPause.setOnClickListener(this);
+        RtspRefreshButton.setOnClickListener(this);
+//        videoPause.setOnClickListener(this);
 
     }
 
@@ -179,9 +203,11 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
         mImageView = findViewById(R.id.filePhotoShow);
         showPresentBtn = findViewById(R.id.camera_activity_showPresentBtn);
         cameraSettingBtn = findViewById(R.id.camera_activity_cameraSettingBtn);
-        mVideoView = findViewById(R.id.video_view);//视频控件
-        videoPause = findViewById(R.id.video_pause);//暂停按钮
-        videoPlay = findViewById(R.id.video_play);//播放按钮
+//        mVideoView = findViewById(R.id.video_view);//视频控件
+        mSurfaceView = findViewById(R.id.surfaceV);
+//        videoPause = findViewById(R.id.video_pause);//暂停按钮
+        RtspRefreshButton = findViewById(R.id.rtsp_refresh);//播放按钮
+        RtspStopButton = findViewById(R.id.rtsp_stop);
     }
 
     private void initLocation() {
@@ -278,19 +304,108 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
         switch (view.getId()) {
             case R.id.camera_activity_showPresentBtn://显示实时画面按钮
 //                initPermission();
-                initVideoPath();
+//                initVideoPath();
+//                String rtspUrl="rtsp://10.10.10.117:554/test.264";
+//                PlayRtspStream(rtspUrl);
 //                showExternalImage();
 //                mImageView.setImageResource(R.drawable.presentvideo);
 //                initVideoPath();
+                showRtsp();
                 break;
             case R.id.camera_activity_cameraSettingBtn://相机设置按钮
                 Intent intent = new Intent(CameraInfoActivity.this, MainActivity.class);
                 intent.putExtra("id", 3);
                 CameraInfoActivity.this.startActivity(intent);
+                break;
+            case R.id.rtsp_refresh:
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mVlcModel.release();
+                    }
+                });
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mVlcModel.attachViews();
+                    }
+                });
+                break;
+            case R.id.rtsp_stop:
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mVlcModel.release();
+                    }
+                });
+                break;
             default:
                 break;
         }
     }
+
+    private void showRtsp() {
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mVlcModel.attachViews();
+            }
+        });
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mVlcModel.updateVideoSurfaces();
+    }
+
+    MediaPlayer.EventListener mEventListener = new MediaPlayer.EventListener() {
+        @Override
+        public void onEvent(MediaPlayer.Event event) {
+            switch (event.type) {
+                case MediaPlayer.Event.Opening:
+                    break;
+                case MediaPlayer.Event.Playing:
+                    break;
+                case MediaPlayer.Event.Buffering:
+                    break;
+                case MediaPlayer.Event.Paused:
+                    break;
+                case MediaPlayer.Event.Stopped:
+                    break;
+                case MediaPlayer.Event.PositionChanged:
+                    break;
+                case MediaPlayer.Event.TimeChanged:
+                    break;
+                case MediaPlayer.Event.SeekableChanged:
+                    break;
+                case MediaPlayer.Event.PausableChanged:
+                    break;
+                case MediaPlayer.Event.MediaChanged:
+                    break;
+                case MediaPlayer.Event.EndReached:
+                    break;
+                case MediaPlayer.Event.EncounteredError:
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    public static int getStatusBarHeight(Context context) {
+        // 获得状态栏高度
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        return context.getResources().getDimensionPixelSize(resourceId);
+    }
+
+    private void PlayRtspStream(String rtspUrl) {
+        mVideoView.setVideoURI(Uri.parse(rtspUrl));
+        mVideoView.requestFocus();
+        mVideoView.start();
+    }
+
 
     private void showExternalImage() {
         String url = "/storage/emulated/0/Pictures/WeiXin/mmexport1605513821590.jpg";
@@ -363,6 +478,29 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
             mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
         }
     }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        mHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                mVlcModel.attachViews();
+//            }
+//        });
+//    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mVlcModel != null) {
+                    mVlcModel.detachViews();
+                }
+            }
+        });
+    }
 
     @Override
     protected void onDestroy() {
@@ -376,6 +514,13 @@ public class CameraInfoActivity extends AppCompatActivity implements View.OnClic
         mBaiduMap.setMyLocationEnabled(false);
         // 在activity执行onDestroy时必须调用mMapView.onDestroy()
         mMapView.onDestroy();
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mVlcModel.release();
+            }
+        });
     }
 
     private void initTestData() {

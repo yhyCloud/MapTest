@@ -31,8 +31,12 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.map.Stroke;
 import com.baidu.mapapi.model.LatLng;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NetworkFragment extends Fragment implements View.OnClickListener {
     private MapView fragNetMapView;
@@ -89,19 +93,33 @@ public class NetworkFragment extends Fragment implements View.OnClickListener {
                 .stroke(new Stroke(1, R.color.colorAccentTran));
         Overlay AP1Circle = fragNetBaiduMap.addOverlay(AP1CircleOptions);
 
-        LatLng AP2 = new LatLng(30.75542, 103.93649);
+        LatLng AP2 = new LatLng(30.75242 , 103.93349 );
         CircleOptions AP2CircleOptions = new CircleOptions().center(AP2)
                 .radius(200)
                 .fillColor(0xAAfcb75c)
                 .stroke(new Stroke(1, R.color.colorAccentTran));
         Overlay AP2Circle = fragNetBaiduMap.addOverlay(AP2CircleOptions);
 
-        LatLng AP3 = new LatLng(30.75242, 103.93349);
+        LatLng AP3 = new LatLng(30.75342, 103.93649);
         CircleOptions AP3CircleOptions = new CircleOptions().center(AP3)
                 .radius(150)
                 .fillColor(0xAAfcb75c)
                 .stroke(new Stroke(1, R.color.colorAccentTran));
         Overlay AP3Circle = fragNetBaiduMap.addOverlay(AP3CircleOptions);
+    }
+
+    private void DrawLine() {
+        LatLng point1 = new LatLng(30.75242, 103.92900);
+        LatLng point2 = new LatLng(30.75032, 103.93059);
+        List<LatLng> linePoints = new ArrayList<>();
+        linePoints.add(point1);
+        linePoints.add(point2);
+        OverlayOptions mOverlayOptions = new PolylineOptions()
+                .width(10)
+                .color(0xAAFF0000)
+                .points(linePoints)
+                .dottedLine(true);//绘制虚线
+        Overlay mPolyline = fragNetBaiduMap.addOverlay(mOverlayOptions);
     }
 
     private void initView(View view) {
@@ -137,6 +155,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener {
                     isFirstDraw = true;
                     DrawAP();
                     DrawBridge();
+                    DrawLine();
                 }
                 break;
             default:

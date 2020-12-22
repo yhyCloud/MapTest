@@ -36,21 +36,33 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_gravity="center_horizontal"
-                    android:src="@drawable/cameradata"
+                    android:src="@drawable/monitor"
                     android:layout_marginTop="92dp"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="相机数据"/>
+                    android:text="实时画面"/>
 
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="73dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="158dp"
-                    android:src="@drawable/monitor" />
+                    android:src="@drawable/photolist" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="数据列表"/>
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="73dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="158dp"
+                    android:src="@drawable/cameradata" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -198,8 +210,12 @@
                     android:layout_height="250dp"
                     android:orientation="vertical"
                     >
-                    <VideoView
-                        android:id="@+id/video_view"
+<!--                    <VideoView-->
+<!--                        android:id="@+id/video_view"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="200dp"/>-->
+                    <SurfaceView
+                        android:id="@+id/surfaceV"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"/>
 
@@ -209,15 +225,15 @@
                         android:orientation="horizontal">
 
                         <Button
-                            android:id="@+id/video_play"
+                            android:id="@+id/rtsp_refresh"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="播放"/>
+                            android:text="刷新"/>
                         <Button
-                            android:id="@+id/video_pause"
+                            android:id="@+id/rtsp_stop"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="暂停"/>
+                            android:text="停止"/>
                     </LinearLayout>
                 </LinearLayout>
                 <ExpandableListView
